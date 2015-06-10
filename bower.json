@@ -1,0 +1,27 @@
+{
+  "name": "contacts-app",
+  "version": "0.1.0",
+  "dependencies": {
+    "core-elements": "Polymer/core-elements#^0.5.1",
+    "paper-elements": "Polymer/paper-elements#^0.5.1",
+    "cache-polyfill": "coonsta/cache-polyfill",
+    "director": "~1.2.2",
+    "grunt": "~0.4.5",
+    "jQuery": "~2.1.4"
+  },
+  "devDependencies": {
+    "polymer-test-tools": "Polymer/polymer-test-tools#^0.5.1"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ],
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
+  }
+}

@@ -1,0 +1,112 @@
+<link rel="import" href="../base-page/base-page.html">
+<link rel="import" href="../../bower_components/core-list/core-list.html">
+<link rel="import" href="../../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown/paper-dropdown.html">
+
+<polymer-element name="movies-page" extends="base-page"
+                 attributes="movies heading">
+  <template>
+    <link rel="stylesheet" href="movies-page.css">
+
+    <core-drawer-panel id="drawerPanel" forceNarrow>
+
+      <!-- Drawer -->
+      <core-header-panel drawer mode="seamed">
+        <core-toolbar>Menu</core-toolbar>
+        <core-menu selected="0" on-core-select="{{closeDrawer}}">
+          <paper-item noink>
+            <a href="/movies/all" on-click="{{navigate}}">
+              All movies
+            </a>
+          </paper-item>
+          <paper-item noink>
+            <a href="/add" on-click="{{navigate}}">
+              Add movie
+            </a>
+          </paper-item>
+        </core-menu>
+      </core-header-panel>
+
+      <!-- Main -->
+      <div main layout vertical>
+        <core-header-panel id="headerPanel" mode="seamed" flex>
+          <core-toolbar>
+            <paper-icon-button icon="menu" core-drawer-toggle>
+            </paper-icon-button>
+            <div id="title" flex>{{heading}}</div>
+
+            <paper-menu-button id="menuBtn" noink>
+              <paper-icon-button icon="more-vert" noink></paper-icon-button>
+              <paper-dropdown class="dropdown" halign="right">
+                <core-menu class="menu">
+                  <paper-item>Settings</paper-item>
+                  <paper-item>Help</paper-item>
+                  <paper-item>Feedback</paper-item>
+                </core-menu>
+              </paper-dropdown>
+            </paper-menu-button>
+
+          </core-toolbar>
+          <div class="content">
+
+            <core-list id="list" data="{{movies}}"
+                                 scrollTarget="{{$.headerPanel.scroller}}"
+                                 runwayFactor="5">
+              <template>
+              <div>
+                <a href="{{index | getUrl}}" on-click="{{navigate}}">
+                  <div class="row" layout horizontal center>
+                    <core-image src="{{model.ImageUrl}}" preload sizing="cover">
+                    </core-image>
+                    <div flex>{{model.Name}}</div>
+                  </div>
+                </a>
+                <paper-icon-button icon="delete" movietodelete="{{model.MovieId}}" on-click={{deleteMovie}}></paper-icon-button>
+                </div>
+              </template>
+            </core-list>
+
+          </div>
+        </core-header-panel>
+
+        <!-- Add contact -->
+        <a href="/add" on-click="{{navigate}}">
+          <paper-fab icon="add" noink></paper-fab>
+        </a>
+      </div>
+    </core-drawer-panel>
+  </template>
+  <script>
+  (function() {
+    Polymer({
+      willPrepare: function() {
+        this.super();
+        this.$.list.updateSize()
+      },
+      getUrl: function(idx) {
+        return '/movies/' + idx;
+      },
+      closeDrawer: function() {
+        // Maybe this could wait till the next frame before animating
+        // out... right now it animates while the list is rebuilding
+        // and causes some jank
+        this.$.drawerPanel.closeDrawer();
+      },
+      deleteMovie: function(event,index, sender) {
+        var row = $(sender).parent();
+        var movieId = sender.templateInstance.model.model.MovieId;
+        var _self = this;
+          $.ajax({
+          url: 'http://moviemanager.azurewebsites.net:80/api/Movies/' + movieId,
+          type: 'DELETE',
+          success: function(result) {
+              row.remove();
+              _self.$.list.updateSize();
+          }
+        });
+      }
+    });
+  })();
+  </script>
+</polymer-element>

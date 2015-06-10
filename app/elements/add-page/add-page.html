@@ -1,0 +1,97 @@
+<link rel="import" href="../base-page/base-page.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<polymer-element name="add-page" extends="base-page" layout vertical>
+  <template>
+    <link rel="stylesheet" href="add-page.css">
+
+    <core-header-panel id="headerPanel" fit mode="seamed">
+
+      <core-toolbar>
+        <a href="/" on-click="{{goBack}}">
+          <paper-icon-button icon="arrow-back"></paper-icon-button>
+        </a>
+        <div id="title" flex>{{assetname}}</div>
+        <a href="/" on-click="{{saveMovie}}">
+          <paper-icon-button icon="check"></paper-icon-button>
+        </a>
+      </core-toolbar>
+
+      <div class="content">
+        <!-- movie photo area -->
+        <div id="moviePhoto" layout horizontal center-justified end>
+            <img src="{{ImageUrl}}">
+        </div>
+
+        <!-- movie form -->
+        <div id="movieForm" style="position: relative;">
+
+          <!-- Name -->
+          <div class="formRow" layout horizontal center>
+            <paper-input class="item item-input" label="Name"
+                         value="{{assetname}}" flex>
+            </paper-input>
+          </div>
+
+          <!-- Genre -->
+          <div class="formRow" layout horizontal center>
+             <paper-input class="item item-input" label="Genre"
+                         value="{{Genre}}" flex>
+            </paper-input>
+
+          </div>
+
+          <!-- Image Url -->
+          <div class="formRow" layout horizontal center>
+            <paper-input class="item item-input" label="Image"
+                         value="{{ImageUrl}}" flex>
+            </paper-input>
+          </div>
+
+        </div>
+      </div>
+
+    </core-header-panel>
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+      publish: {
+        movies: null
+      },
+      assetname: null,
+      ImageUrl: null,
+      Genre: null,
+      favourite: "false",
+      willPrepare: function() {
+        this.super();
+
+        // Reset the scroller so every time the user comes to the add page
+        // they see the top of the form
+        this.$.headerPanel.scroller.scrollTop = 0;
+      },
+      saveMovie: function (event) {
+        event.preventDefault();
+
+        var _self = this;
+        console.log(movies)
+        console.log("savingMovie");
+
+        $.post("http://moviemanager.azurewebsites.net:80/api/Movies", {
+          Name: _self.assetname,
+          ImageUrl: _self.ImageUrl,
+          Genre: _self.Genre,
+          favourite: _self.favourite
+        }, function(){
+          _self.fire('change-route', "/movies");
+        });
+      }
+
+    });
+
+  })();
+  </script>
+</polymer-element>

@@ -1,0 +1,83 @@
+<link rel="import" href="../base-page/base-page.html">
+
+<polymer-element name="info-page" extends="base-page" attributes="movieId movies movieName" layout vertical>
+  <template>
+    <link rel="stylesheet" href="info-page.css">
+
+    <!--
+    On larger screens, change the behavior of the header panel so it doesn't
+    scroll away or do the condenses feature. Instead, treat its content like
+    a regular toolbar.
+    -->
+    <core-media-query query="min-width: 640px" queryMatches="{{largeScreen}}">
+    </core-media-query>
+
+    <core-scroll-header-panel id="scrollHeaderPanel"
+                              condenses?="{{!largeScreen}}"
+                              fixed?="{{largeScreen}}"
+                              flex>
+
+      <core-toolbar class="{{ {tall: !largeScreen} | tokenList}}">
+        <a href="/" on-click="{{goBack}}">
+          <paper-icon-button icon="arrow-back"></paper-icon-button>
+        </a>
+        <div id="title" class="bottom indent">{{movies[movieId].Name}}</div>
+      </core-toolbar>
+      <div content>
+
+        <div class="card-header">
+          <div class="single-line" layout horizontal center>
+            <core-image src="{{movies[movieId].ImageUrl}}" preload sizing="cover">
+            </core-image>
+            <div class="card-name"  hidden?="{{!largeScreen}}">{{movies[movieId].Name}}</div>
+          </div>
+        </div>
+
+      </div>
+    </core-scroll-header-panel>
+    <div class="content" flex>
+      <p>Title: {{movies[movieId].Name}}</p>
+      <p>Genre: {{movies[movieId].Genre}}</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    </div>
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+      domReady: function() {
+        // custom transformation: scale header's title
+        var titleStyle = this.$.title.style;
+        document.addEventListener('core-header-transform', function(e) {
+          var d = e.detail;
+          var m = d.height - d.condensedHeight;
+          var scale = Math.max(0.55, (m - d.y) / (m / 0.25) + 0.55);
+          titleStyle.transform = titleStyle.webkitTransform =
+            'scale(' + scale + ') translateZ(0)';
+        });
+      },
+      willPrepare: function() {
+        this.super();
+
+        // Measure the core-scroll-header-panel, otherwise its height will
+        // be messed up
+        this.$.scrollHeaderPanel.measureHeaderHeight();
+
+        // Reset the scroller so every time the user comes to the info page
+        // so they see the full profile photo
+        this.$.scrollHeaderPanel.scroller.scrollTop = 0;
+      },
+      movieIdChanged: function(oldVal, newVal) {
+        this.movie_ = this.movies[newVal];
+
+        if (this.largeScreen) return;
+
+        // Update the core-scroll-header-panel's background image with the
+        // user's avatar if we're on a small screen
+        this.$.scrollHeaderPanel.$.headerBg.style.background = 'url('+this.movie_.avatar+') 0 / cover no-repeat';
+      }
+    });
+  })();
+  </script>
+</polymer-element>
